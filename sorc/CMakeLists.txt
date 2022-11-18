@@ -6,12 +6,14 @@ option(BUILD_UFS_UTILS "Build UFS utilities" ON)
 option(BUILD_UPP "Build UPP" ON)
 option(BUILD_GSI "Build GSI" OFF)
 option(BUILD_RRFS_UTILS "Build RRFS utilities" OFF)
+option(BUILD_REGIONAL_BUFR "Build REGIONAL_BUFR " OFF)
 
 message(STATUS "BUILD_UFS ............... ${BUILD_UFS}")
 message(STATUS "BUILD_UFS_UTILS ......... ${BUILD_UFS_UTILS}")
 message(STATUS "BUILD_GSI ............... ${BUILD_GSI}")
 message(STATUS "BUILD_UPP ............... ${BUILD_UPP}")
 message(STATUS "BUILD_RRFS_UTILS ........ ${BUILD_RRFS_UTILS}")
+message(STATUS "BUILD_REGIONAL_BUFR ..... ${BUILD_REGIONAL_BUFR}")
 
 # Build UFS utilities
 if(BUILD_UFS_UTILS)
@@ -133,6 +135,20 @@ if (BUILD_RRFS_UTILS)
     BUILD_ALWAYS TRUE
     STEP_TARGETS build
     DEPENDS GSI
+    )
+endif()
+
+# Build regional_bufr
+if (BUILD_REGIONAL_BUFR)
+  list(APPEND TARGET_LIST REGIONAL_BUFR)
+
+  ExternalProject_Add(REGIONAL_BUFR
+    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/regional_bufr
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/regional_bufr
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DCMAKE_INSTALL_BINDIR=${CMAKE_INSTALL_BINDIR}
+    BUILD_ALWAYS TRUE
+    STEP_TARGETS build
     )
 endif()
 

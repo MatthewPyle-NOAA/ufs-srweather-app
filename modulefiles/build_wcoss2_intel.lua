@@ -33,6 +33,7 @@ load(pathJoin("g2tmpl", os.getenv("g2tmpl_ver")))
 load(pathJoin("ip", os.getenv("ip_ver")))
 load(pathJoin("sp", os.getenv("sp_ver")))
 load(pathJoin("w3nco", os.getenv("w3nco_ver")))
+load(pathJoin("bufr", os.getenv("bufr_ver")))
 
 load(pathJoin("libjpeg", os.getenv("libjpeg_ver")))
 load(pathJoin("cray-pals", os.getenv("cray_pals_ver")))

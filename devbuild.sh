@@ -54,7 +54,7 @@ OPTIONS
 TARGETS
    default = builds the default list of apps (also not passing any target does the same)
    all = builds all apps
-   Or any combinations of (ufs, ufs_utils, upp, gsi, rrfs_utils)
+   Or any combinations of (ufs, ufs_utils, upp, gsi, rrfs_utils, regional_bufr)
 
 NOTE: This script is for internal developer use only;
 See User's Guide for detailed build instructions
@@ -178,7 +178,7 @@ while :; do
     default) ;;
     all) DEFAULT_BUILD=false; BUILD_UFS="on";
          BUILD_UFS_UTILS="on"; BUILD_UPP="on";
-         BUILD_GSI="on"; BUILD_REGIONAL_BUFR="on"; BUILD_RRFS_UTILS="on";;
+         BUILD_GSI="on"; BUILD_REGIONAL_BUFR="on";BUILD_RRFS_UTILS="on";;
     ufs) DEFAULT_BUILD=false; BUILD_UFS="on" ;;
     ufs_utils) DEFAULT_BUILD=false; BUILD_UFS_UTILS="on" ;;
     upp) DEFAULT_BUILD=false; BUILD_UPP="on" ;;
@@ -307,8 +307,8 @@ CMAKE_SETTINGS="\
  -DBUILD_UFS_UTILS=${BUILD_UFS_UTILS}\
  -DBUILD_UPP=${BUILD_UPP}\
  -DBUILD_GSI=${BUILD_GSI}\
+ -DBUILD_REGIONAL_BUFR=${BUILD_REGIONAL_BUFR}\
  -DBUILD_RRFS_UTILS=${BUILD_RRFS_UTILS}"
- -DBUILD_REGIONAL_BUFR=${BUILD_REGIONAL_BUFR}"
 
 if [ ! -z "${APPLICATION}" ]; then
   CMAKE_SETTINGS="${CMAKE_SETTINGS} -DAPP=${APPLICATION}"
@@ -393,12 +393,12 @@ if [ $USE_SUB_MODULES = true ]; then
         module use ${SRW_DIR}/sorc/gsi/modulefiles
         load_module "gsi_"
     fi
-    if [ $BUILD_RRFS_UTILS = "on" ]; then
-        printf "... Loading RRFS_UTILS modules ...\n"
+    if [ $BUILD_REGIONAL_BUFR = "on" ]; then
+        printf "... Loading REGIONAL_BUFR modules ...\n"
         load_module ""
     fi
-    if [ $BUILD_REGIONAL_BUFR = "on" ]; then
-        printf "... Loading RRFS_REGIONAL_BUFR modules ...\n"
+    if [ $BUILD_RRFS_UTILS = "on" ]; then
+        printf "... Loading RRFS_UTILS modules ...\n"
         load_module ""
     fi
 else
