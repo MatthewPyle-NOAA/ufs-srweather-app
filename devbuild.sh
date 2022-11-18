@@ -87,6 +87,7 @@ Settings:
   BUILD_UPP=${BUILD_UPP}
   BUILD_GSI=${BUILD_GSI}
   BUILD_RRFS_UTILS=${BUILD_RRFS_UTILS}
+  BUILD_REGIONAL_BUFR=${BUILD_REGIONAL_BUFR}
 
 EOF_SETTINGS
 }
@@ -123,6 +124,7 @@ BUILD_UFS_UTILS="off"
 BUILD_UPP="off"
 BUILD_GSI="off"
 BUILD_RRFS_UTILS="off"
+BUILD_REGIONAL_BUFR="off"
 
 # Make options
 CLEAN=false
@@ -176,12 +178,13 @@ while :; do
     default) ;;
     all) DEFAULT_BUILD=false; BUILD_UFS="on";
          BUILD_UFS_UTILS="on"; BUILD_UPP="on";
-         BUILD_GSI="on"; BUILD_RRFS_UTILS="on";;
+         BUILD_GSI="on"; BUILD_REGIONAL_BUFR="on"; BUILD_RRFS_UTILS="on";;
     ufs) DEFAULT_BUILD=false; BUILD_UFS="on" ;;
     ufs_utils) DEFAULT_BUILD=false; BUILD_UFS_UTILS="on" ;;
     upp) DEFAULT_BUILD=false; BUILD_UPP="on" ;;
     gsi) DEFAULT_BUILD=false; BUILD_GSI="on" ;;
     rrfs_utils) DEFAULT_BUILD=false; BUILD_RRFS_UTILS="on" ;;
+    regional_bufr) DEFAULT_BUILD=false; BUILD_REGIONAL_BUFR="on" ;;
     # unknown
     -?*|?*) usage_error "Unknown option $1" ;;
     *) break
@@ -305,6 +308,7 @@ CMAKE_SETTINGS="\
  -DBUILD_UPP=${BUILD_UPP}\
  -DBUILD_GSI=${BUILD_GSI}\
  -DBUILD_RRFS_UTILS=${BUILD_RRFS_UTILS}"
+ -DBUILD_REGIONAL_BUFR=${BUILD_REGIONAL_BUFR}"
 
 if [ ! -z "${APPLICATION}" ]; then
   CMAKE_SETTINGS="${CMAKE_SETTINGS} -DAPP=${APPLICATION}"
@@ -391,6 +395,10 @@ if [ $USE_SUB_MODULES = true ]; then
     fi
     if [ $BUILD_RRFS_UTILS = "on" ]; then
         printf "... Loading RRFS_UTILS modules ...\n"
+        load_module ""
+    fi
+    if [ $BUILD_REGIONAL_BUFR = "on" ]; then
+        printf "... Loading RRFS_REGIONAL_BUFR modules ...\n"
         load_module ""
     fi
 else
