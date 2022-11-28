@@ -828,6 +828,9 @@ workflow_switches:
   # RUN_TASK_RUN_POST:
   # Flag that determines whether the RUN_POST_TN task is to be run.
   # 
+  # RUN_TASK_RUN_BUFRPOST:
+  # Flag that determines whether the RUN_BUFRPOST_TN task is to be run.
+  # 
   # RUN_TASK_GET_OBS_CCPA:
   # Flag that determines whether to run the GET_OBS_CCPA_TN task, which
   # retrieves the CCPA hourly precipitation files used by METplus from NOAA HPSS. 
@@ -869,6 +872,7 @@ workflow_switches:
   RUN_TASK_MAKE_LBCS: true
   RUN_TASK_RUN_FCST: true
   RUN_TASK_RUN_POST: true
+  RUN_TASK_RUN_BUFRPOST: true
   
   RUN_TASK_GET_OBS_CCPA: false
   RUN_TASK_GET_OBS_MRMS: false
@@ -1753,6 +1757,15 @@ task_run_post:
   CUSTOM_POST_CONFIG_FP: ""
   POST_OUTPUT_DOMAIN_NAME: ""
 
+task_run_bufrpost:
+  RUN_BUFRPOST_TN: "run_bufrpost"
+  NNODES_RUN_BUFRPOST: 1
+  PPN_RUN_BUFRPOST: 1
+  WTIME_RUN_BUFRPOST: 00:15:00
+  MAXTRIES_RUN_BUFRPOST: 2
+  KMP_AFFINITY_RUN_BUFRPOST: "scatter"
+  OMP_NUM_THREADS_RUN_BUFRPOST: 1
+  OMP_STACKSIZE_RUN_BUFRPOST: "1024m"
 #----------------------------
 # GET OBS CCPA config parameters
 #-----------------------------
