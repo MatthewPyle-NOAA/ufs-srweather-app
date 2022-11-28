@@ -64,14 +64,14 @@ export OMP_STACKSIZE=${OMP_STACKSIZE_RUN_POST}
 #
 eval ${PRE_TASK_CMDS}
 
-nprocs=$(( NNODES_RUN_POST*PPN_RUN_POST ))
-if [ -z "${RUN_CMD_POST:-}" ] ; then
+nprocs=$(( NNODES_RUN_BUFRPOST*PPN_RUN_BUFRPOST ))
+if [ -z "${RUN_CMD_BUFRPOST:-}" ] ; then
   print_err_msg_exit "\
   Run command was not set in machine file. \
-  Please set RUN_CMD_POST for your platform"
+  Please set RUN_CMD_BUFRPOST for your platform"
 else
   print_info_msg "$VERBOSE" "
-  All executables will be submitted with command \'${RUN_CMD_POST}\'."
+  All executables will be submitted with command \'${RUN_CMD_BUFRPOST}\'."
 fi
 #
 #-----------------------------------------------------------------------
@@ -82,23 +82,7 @@ fi
 #-----------------------------------------------------------------------
 #
 rm_vrfy -f fort.*
-cp_vrfy ${PARMdir}/upp/nam_micro_lookup.dat ./eta_micro_lookup.dat
-if [ ${USE_CUSTOM_POST_CONFIG_FILE} = "TRUE" ]; then
-  post_config_fp="${CUSTOM_POST_CONFIG_FP}"
-  print_info_msg "
-====================================================================
-Copying the user-defined post flat file specified by CUSTOM_POST_CONFIG_FP
-to the temporary work directory (DATA_FHR):
-  CUSTOM_POST_CONFIG_FP = \"${CUSTOM_POST_CONFIG_FP}\"
-  DATA_FHR = \"${DATA_FHR}\"
-===================================================================="
-else
-  if [ ${FCST_MODEL} = "fv3gfs_aqm" ]; then
-    post_config_fp="${PARMdir}/upp/postxconfig-NT-fv3lam_cmaq.txt"
-  else
-    post_config_fp="${PARMdir}/upp/postxconfig-NT-fv3lam.txt"
-  fi
-  print_info_msg "
+
 ====================================================================
 Copying the default post flat file specified by post_config_fp to the 
 temporary work directory (DATA_FHR):
@@ -106,26 +90,7 @@ temporary work directory (DATA_FHR):
   DATA_FHR = \"${DATA_FHR}\"
 ===================================================================="
 fi
-cp_vrfy ${post_config_fp} ./postxconfig-NT.txt
 cp_vrfy ${PARMdir}/upp/params_grib2_tbl_new .
-if [ ${USE_CRTM} = "TRUE" ]; then
-  cp_vrfy ${CRTM_DIR}/fix/EmisCoeff/IR_Water/Big_Endian/Nalli.IRwater.EmisCoeff.bin ./
-  cp_vrfy ${CRTM_DIR}/fix/EmisCoeff/MW_Water/Big_Endian/FAST*.bin ./
-  cp_vrfy ${CRTM_DIR}/fix/EmisCoeff/IR_Land/SEcategory/Big_Endian/NPOESS.IRland.EmisCoeff.bin ./
-  cp_vrfy ${CRTM_DIR}/fix/EmisCoeff/IR_Snow/SEcategory/Big_Endian/NPOESS.IRsnow.EmisCoeff.bin ./
-  cp_vrfy ${CRTM_DIR}/fix/EmisCoeff/IR_Ice/SEcategory/Big_Endian/NPOESS.IRice.EmisCoeff.bin ./
-  cp_vrfy ${CRTM_DIR}/fix/AerosolCoeff/Big_Endian/AerosolCoeff.bin ./
-  cp_vrfy ${CRTM_DIR}/fix/CloudCoeff/Big_Endian/CloudCoeff.bin ./
-  cp_vrfy ${CRTM_DIR}/fix/SpcCoeff/Big_Endian/*.bin ./
-  cp_vrfy ${CRTM_DIR}/fix/TauCoeff/ODPS/Big_Endian/*.bin ./
-  print_info_msg "
-====================================================================
-Copying the external CRTM fix files from CRTM_DIR to the temporary
-work directory (DATA_FHR):
-  CRTM_DIR = \"${CRTM_DIR}\"
-  DATA_FHR = \"${DATA_FHR}\"
-===================================================================="
-fi
 #
 #-----------------------------------------------------------------------
 #
@@ -184,41 +149,20 @@ post_dd=${post_time:6:2}
 post_hh=${post_time:8:2}
 post_mn=${post_time:10:2}
 #
-# Create the input namelist file to the post-processor executable.
-#
-if [ ${FCST_MODEL} = "fv3gfs_aqm" ]; then
-  post_itag_add="aqfcmaq_on=.true.,"
-else
-  post_itag_add=""
-fi
-cat > itag <<EOF
-&model_inputs
-fileName='${dyn_file}'
-IOFORM='netcdf'
-grib='grib2'
-DateStr='${post_yyyy}-${post_mm}-${post_dd}_${post_hh}:${post_mn}:00'
-MODELNAME='FV3R'
-fileNameFlux='${phy_file}'
-/
-
- &NAMPGB
- KPO=47,PO=1000.,975.,950.,925.,900.,875.,850.,825.,800.,775.,750.,725.,700.,675.,650.,625.,600.,575.,550.,525.,500.,475.,450.,425.,400.,375.,350.,325.,300.,275.,250.,225.,200.,175.,150.,125.,100.,70.,50.,30.,20.,10.,7.,5.,3.,2.,1.,${post_itag_add}
- /
-EOF
 #
 #-----------------------------------------------------------------------
 #
-# Run the UPP executable in the temporary directory (DATA_FHR) for this
+# Run the bufrpost executable in the temporary directory (DATA_FHR) for this
 # output time.
 #
 #-----------------------------------------------------------------------
 #
 print_info_msg "$VERBOSE" "
-Starting post-processing for fhr = $fhr hr..."
+Starting BUFR post-processing for fhr = $fhr hr..."
 
 PREP_STEP
 eval ${RUN_CMD_POST} ${EXECdir}/upp.x < itag ${REDIRECT_OUT_ERR} || print_err_msg_exit "\
-Call to executable to run post for forecast hour $fhr returned with non-
+Call to executable to run bufrpost for forecast hour $fhr returned with non-
 zero exit code."
 POST_STEP
 #
