@@ -64,13 +64,6 @@ on the output files corresponding to a specified forecast hour.
 #
 DATA="${DATA:-${COMIN}${SLASH_ENSMEM_SUBDIR}}"
 #
-# If SUB_HOURLY_POST is not set to "TRUE", ensure that the forecast 
-# minutes (fmn) are set to "00".  This is necessary in order to pass
-# "fmn" into the post ex-script for the calculation of post_time.
-#
-if [ "${SUB_HOURLY_POST}" != "TRUE" ]; then
-  export fmn="00"
-fi
 #
 #-----------------------------------------------------------------------
 #
@@ -95,15 +88,10 @@ if [ "${RUN_ENVIR}" != "nco" ]; then
 fi
 mkdir_vrfy -p "${COMOUT}"
 
-if [ "${SUB_HOURLY_POST}" = "TRUE" ]; then
-  export DATA_FHR="${DATA:-$COMOUT}/$fhr$fmn"
-else
-  export DATA_FHR="${DATA:-$COMOUT}/$fhr"
-fi
-check_for_preexist_dir_file "${DATA_FHR}" "delete"
-mkdir_vrfy -p "${DATA_FHR}"
+check_for_preexist_dir_file "${DATA}" "delete"
+mkdir_vrfy -p "${DATA}"
 
-cd_vrfy "${DATA_FHR}"
+cd_vrfy "${DATA}"
 #
 #-----------------------------------------------------------------------
 #
@@ -111,13 +99,13 @@ cd_vrfy "${DATA_FHR}"
 #
 #-----------------------------------------------------------------------
 #
-export fhr=$( printf "%s" "${fhr}" | $SED -n -r -e "s/^([0-9]+)$/\1/p" )
-if [ -z "$fhr" ]; then
-  print_err_msg_exit "\
-The forecast hour (fhr) must be a non-empty string consisting of only 
-digits:
-  fhr = \"${fhr}\""
-fi
+# export fhr=$( printf "%s" "${fhr}" | $SED -n -r -e "s/^([0-9]+)$/\1/p" )
+# if [ -z "$fhr" ]; then
+#  print_err_msg_exit "\
+# The forecast hour (fhr) must be a non-empty string consisting of only 
+# digits:
+#   fhr = \"${fhr}\""
+# fi
 #
 #-----------------------------------------------------------------------
 #

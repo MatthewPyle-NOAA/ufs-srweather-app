@@ -521,8 +521,8 @@ MODULES_RUN_TASK_FP script.
       <walltime>{{ wtime_run_bufrpost }}</walltime>
       <nodesize>&NCORES_PER_NODE;</nodesize>
       <native>&SCHED_NATIVE_CMD;</native>
-      <jobname>&RUN_BUFRPOST_TN;{{ uscore_ensmem_name }}_f#fhr##fmn#</jobname>
-      <join>&LOGDIR;/&RUN_BUFRPOST_TN;{{ uscore_ensmem_name }}_f#fhr##fmn#<cyclestr>_@Y@m@d@H</cyclestr>&LOGEXT;</join>
+      <jobname>&RUN_BUFRPOST_TN;{{ uscore_ensmem_name }}</jobname>
+      <join>&LOGDIR;/&RUN_BUFRPOST_TN;{{ uscore_ensmem_name }}<cyclestr>_@Y@m@d@H</cyclestr>&LOGEXT;</join>
 
       <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
       <envar><name>USHdir</name><value>&USHdir;</value></envar>
