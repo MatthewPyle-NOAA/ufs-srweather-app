@@ -42,7 +42,7 @@ print_info_msg "
 Entering script:  \"${scrfunc_fn}\"
 In directory:     \"${scrfunc_dir}\"
 
-This is the ex-script for the task that runs the post-processor (UPP) on
+This is the ex-script for the task that runs the BUFR post-processor on
 the output files corresponding to a specified forecast hour.
 ========================================================================"
 #
@@ -65,6 +65,7 @@ export OMP_STACKSIZE=${OMP_STACKSIZE_RUN_BUFRPOST}
 eval ${PRE_TASK_CMDS}
 
 nprocs=$(( NNODES_RUN_BUFRPOST*PPN_RUN_BUFRPOST ))
+
 if [ -z "${RUN_CMD_BUFRPOST:-}" ] ; then
   print_err_msg_exit "\
   Run command was not set in machine file. \
@@ -83,14 +84,9 @@ fi
 #
 rm_vrfy -f fort.*
 
-====================================================================
-Copying the default post flat file specified by post_config_fp to the 
-temporary work directory (DATA_FHR):
-  post_config_fp = \"${post_config_fp}\"
-  DATA_FHR = \"${DATA_FHR}\"
-===================================================================="
-fi
-cp_vrfy ${PARMdir}/upp/params_grib2_tbl_new .
+# ====================================================================
+## DATA_FHR = \"${DATA_FHR}\"
+# ===================================================================="
 #
 #-----------------------------------------------------------------------
 #
@@ -109,25 +105,7 @@ hh=${cyc}
 #
 #-----------------------------------------------------------------------
 #
-# Set the variable (mnts_secs_str) that determines the suffix in the names 
-# of the forecast model's write-component output files that specifies the 
-# minutes and seconds of the corresponding output forecast time.
 #
-# Note that if the forecast model is instructed to output at some hourly
-# interval (via the output_fh parameter in the MODEL_CONFIG_FN file, 
-# with nsout set to a non-positive value), then the write-component
-# output file names will not contain any suffix for the minutes and seconds.
-# For this reason, when SUB_HOURLY_POST is not set to "TRUE", mnts_sec_str
-# must be set to a null string.
-#
-mnts_secs_str=""
-if [ "${SUB_HOURLY_POST}" = "TRUE" ]; then
-  if [ ${fhr}${fmn} = "00000" ]; then
-    mnts_secs_str=":"$( $DATE_UTIL --utc --date "${yyyymmdd} ${hh} UTC + ${DT_ATMOS} seconds" "+%M:%S" )
-  else
-    mnts_secs_str=":${fmn}:00"
-  fi
-fi
 #
 # Set the names of the forecast model's write-component output files.
 #
@@ -136,18 +114,9 @@ if [ "${RUN_ENVIR}" = "nco" ]; then
 else
     DATAFCST=$DATA
 fi
-dyn_file="${DATAFCST}/dynf${fhr}${mnts_secs_str}.nc"
-phy_file="${DATAFCST}/phyf${fhr}${mnts_secs_str}.nc"
-#
-# Set parameters that specify the actual time (not forecast time) of the
-# output.
-#
-post_time=$( $DATE_UTIL --utc --date "${yyyymmdd} ${hh} UTC + ${fhr} hours + ${fmn} minutes" "+%Y%m%d%H%M" )
-post_yyyy=${post_time:0:4}
-post_mm=${post_time:4:2}
-post_dd=${post_time:6:2}
-post_hh=${post_time:8:2}
-post_mn=${post_time:10:2}
+
+dyn_file="${DATAFCST}/dynf${fhr}.nc"
+phy_file="${DATAFCST}/phyf${fhr}.nc"
 #
 #
 #-----------------------------------------------------------------------
@@ -160,10 +129,46 @@ post_mn=${post_time:10:2}
 print_info_msg "$VERBOSE" "
 Starting BUFR post-processing..."
 
+# need profdat file, and profilm file, and itag file
 
-# how to loop over forecast hours
+tmmark=tm00
+
+cp  /lfs/h2/emc/lam/noscrub/Matthew.Pyle/ufs_srw_bufr/fix/fix_lam/hiresw_conusfv3sar_lambert_profdat_conus25km rrfs_profdat
 
 PREP_STEP
+
+export FORT19="$DATA_FHR/rrfs_profdat"
+export FORT79="$DATA_FHR/profilm.c1.${tmmark}"
+export FORT11="itag"
+
+model=FV3S
+OUTTYP=netcdf
+NFILE=1
+INCR=01
+NSTAT=1850  # how automate?
+
+YYYY=`echo $PDY | cut -c1-4`
+MM=`echo $PDY | cut -c5-6`
+DD=`echo $PDY | cut -c7-8`
+
+STARTDATE=${YYYY}-${MM}-${DD}_${cyc}:00:00
+
+cat > itag <<EOF
+$dyn_file
+$phy_file
+$model
+$OUTTYP
+$STARTDATE
+$NFILE
+$INCR
+$fhr
+$NSTAT
+$dyn_file
+$phy_file
+EOF
+
+
+#worked eval ${EXECdir}/rrfs_bufr.x < itag || print_err_msg_exit "\
 eval ${RUN_CMD_BUFRPOST} ${EXECdir}/rrfs_bufr.x < itag ${REDIRECT_OUT_ERR} || print_err_msg_exit "\
 Call to executable to run bufrpost for forecast hour $fhr returned with non-
 zero exit code."
@@ -179,25 +184,9 @@ POST_STEP
 #-----------------------------------------------------------------------
 #
 #
-cd_vrfy "${COMOUT}"
-basetime=$( $DATE_UTIL --date "$yyyymmdd $hh" +%y%j%H%M )
-symlink_suffix="${dot_ensmem}.${basetime}f${fhr}${post_mn}"
-fids=( "prslev" "natlev" )
-for fid in "${fids[@]}"; do
-  FID=$(echo_uppercase $fid)
-  post_orig_fn="${FID}.${post_fn_suffix}"
-  post_renamed_fn="${NET}.${cycle}${dot_ensmem}.${fid}.${post_renamed_fn_suffix}"
-  mv_vrfy ${DATA_FHR}/${post_orig_fn} ${post_renamed_fn}
-  if [ $RUN_ENVIR != "nco" ]; then
-    create_symlink_to_file target="${post_renamed_fn}" \
-                         symlink="${FID}${symlink_suffix}" \
-                         relative="TRUE"
-  fi
-  # DBN alert
-  if [ $SENDDBN = "TRUE" ]; then
-    $DBNROOT/bin/dbn_alert MODEL rrfs_post ${job} ${COMOUT}/${post_renamed_fn}
-  fi
-done
+# cd_vrfy "${COMOUT}"
+# basetime=$( $DATE_UTIL --date "$yyyymmdd $hh" +%y%j%H%M )
+# symlink_suffix="${dot_ensmem}.${basetime}f${fhr}${post_mn}"
 
 # rm_vrfy -rf ${DATA_FHR}
 

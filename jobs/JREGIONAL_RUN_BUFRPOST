@@ -82,16 +82,20 @@ DATA="${DATA:-${COMIN}${SLASH_ENSMEM_SUBDIR}}"
 # versions are deleted.
 #
 #-----------------------------------------------------------------------
+
+export DATA_FHR="${DATA:-$COMOUT}/$fhr"
+
 #
 if [ "${RUN_ENVIR}" != "nco" ]; then
   export COMOUT="${DATA}/bufrpostprd"
 fi
 mkdir_vrfy -p "${COMOUT}"
 
-check_for_preexist_dir_file "${DATA}" "delete"
-mkdir_vrfy -p "${DATA}"
+check_for_preexist_dir_file "${DATA_FHR}" "delete"
+mkdir_vrfy -p "${DATA_FHR}"
 
-cd_vrfy "${DATA}"
+cd_vrfy "${DATA_FHR}"
+
 #
 #-----------------------------------------------------------------------
 #
@@ -99,13 +103,13 @@ cd_vrfy "${DATA}"
 #
 #-----------------------------------------------------------------------
 #
-# export fhr=$( printf "%s" "${fhr}" | $SED -n -r -e "s/^([0-9]+)$/\1/p" )
-# if [ -z "$fhr" ]; then
-#  print_err_msg_exit "\
-# The forecast hour (fhr) must be a non-empty string consisting of only 
-# digits:
-#   fhr = \"${fhr}\""
-# fi
+export fhr=$( printf "%s" "${fhr}" | $SED -n -r -e "s/^([0-9]+)$/\1/p" )
+if [ -z "$fhr" ]; then
+ print_err_msg_exit "\
+The forecast hour (fhr) must be a non-empty string consisting of only 
+digits:
+  fhr = \"${fhr}\""
+fi
 #
 #-----------------------------------------------------------------------
 #
