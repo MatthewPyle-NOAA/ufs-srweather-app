@@ -8,9 +8,13 @@
 #-----------------------------------------------------------------------
 #
 export share_pid=${WORKFLOW_ID}_${PDY}${cyc}
-if [ $# -ne 0 ]; then
+if [ $# -ne 0 -a $1 = "TRUE" ]; then
     export pid=$share_pid
     export jobid=${job}.${pid}
+elif [ $# -ne 0 -a  $1 = "BUFR" ] ; then
+    export jobid=${job}_t${cyc}z
+elif [ $# -ne 0 -a  $1 = "POST" ] ; then
+    export jobid=${job}_t${cyc}z
 fi
 #
 #-----------------------------------------------------------------------
