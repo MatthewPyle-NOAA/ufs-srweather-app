@@ -170,10 +170,69 @@ EOF
 
 #worked eval ${EXECdir}/rrfs_bufr.x < itag || print_err_msg_exit "\
 eval ${RUN_CMD_BUFRPOST} ${EXECdir}/rrfs_bufr.x < itag ${REDIRECT_OUT_ERR} || print_err_msg_exit "\
-Call to executable to run bufrpost for forecast hour $fhr returned with non-
+Call to executable to run rrfs_bufr for forecast hour $fhr returned with non-
 zero exit code."
 POST_STEP
-#
+
+mv_vrfy ./profilm.c1.${tmmark} ../profilm.c1.f${fhr}
+
+
+echo do we know FCST_LEN_HRS as $FCST_LEN_HRS
+
+fhr_l=$(printf "%03d" $FCST_LEN_HRS)
+if [ $fhr = $fhr_l ]
+then
+	echo WOULD DO SOMETHING SPECIAL
+	cd ../
+
+	if [ -e profilm.c1.all ]; then
+		rm profilm.c1.all
+	fi
+
+hrcheck=0
+
+while [ $hrcheck -le $FCST_LEN_HRS ]
+do
+	hrcheck_l=$(printf "%03d" $hrcheck)
+
+	if [ ! -e profilm.c1.f${hrcheck_l} ]
+	then
+		sleep 30
+	fi
+
+	cat profilm.c1.f${hrcheck_l} >> profilm.c1.all
+	let hrcheck=hrcheck+1
+done
+
+export pgm=rrfs_sndp
+
+. prep_step
+
+cp $PARMdir/rrfs_sndp.parm.mono $DATA/rrfs_sndp.parm.mono
+cp $PARMdir/rrfs_bufr.tbl $DATA/rrfs_bufr.tbl
+
+export FORT11="$DATA/rrfs_sndp.parm.mono"
+export FORT32="$DATA/rrfs_bufr.tbl"
+export FORT66="$DATA/profilm.c1.all"
+export FORT78="$DATA/class1.bufr"
+
+startmsg
+
+echo here model $model
+
+# how handle more flexibly
+nlev=64
+
+echo "$nlev $NSTAT $FCST_LEN_HRS" > itag
+
+eval ${RUN_CMD_BUFRPOST} ${EXECdir}/rrfs_sndp.x < itag ${REDIRECT_OUT_ERR} || print_err_msg_exit "\
+Call to executable to run rrfs_sndp for forecast hour $fhr returned with non-
+zero exit code."
+POST_STEP
+
+
+fi
+
 #-----------------------------------------------------------------------
 #
 # Move and rename the output files from the work directory to their final 

@@ -514,7 +514,7 @@ MODULES_RUN_TASK_FP script.
 ************************************************************************
 -->
   <metatask>
-    <var name="fhr">{% for h in range(1, fcst_len_hrs+1) %}{{ " %03d" % h }}{% endfor %} </var>
+    <var name="fhr">{% for h in range(0, fcst_len_hrs+1) %}{{ " %03d" % h }}{% endfor %} </var>
   <task name="&RUN_BUFRPOST_TN;{{ uscore_ensmem_name }}_f#fhr#" cycledefs="forecast" maxtries="{{ maxtries_run_bufrpost }}">
 
 
@@ -582,7 +582,7 @@ later below for other output times.
       <walltime>{{ wtime_run_post }}</walltime>
       <nodesize>&NCORES_PER_NODE;</nodesize>
       <native>&SCHED_NATIVE_CMD;</native>
-      <jobname>&RUN_POST_TN;{{ uscore_ensmem_name }}_f#fhr##fmn#</jobname>
+      <jobname>&RUN_POST_TN;{{ uscore_ensmem_name }}</jobname>
       <join>&LOGDIR;/&RUN_POST_TN;{{ uscore_ensmem_name }}_f#fhr##fmn#<cyclestr>_@Y@m@d@H</cyclestr>&LOGEXT;</join>
 
       <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
@@ -639,7 +639,7 @@ for other output times.
         <walltime>{{ wtime_run_post }}</walltime>
         <nodesize>&NCORES_PER_NODE;</nodesize>
         <native>&SCHED_NATIVE_CMD;</native>
-        <jobname>&RUN_POST_TN;{{ uscore_ensmem_name }}_f#fhr##fmn#</jobname>
+        <jobname>&RUN_POST_TN;{{ uscore_ensmem_name }}</jobname>
 	<join>&LOGDIR;/&RUN_POST_TN;{{ uscore_ensmem_name }}_f#fhr##fmn#<cyclestr>_@Y@m@d@H</cyclestr>&LOGEXT;</join>
 
         <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
@@ -702,10 +702,10 @@ always zero).
         <nodesize>&NCORES_PER_NODE;</nodesize>
         <native>&SCHED_NATIVE_CMD;</native>
         {%- if sub_hourly_post %}
-        <jobname>&RUN_POST_TN;{{ uscore_ensmem_name }}_f#fhr##fmn#</jobname>
+        <jobname>&RUN_POST_TN;{{ uscore_ensmem_name }}</jobname>
 	<join>&LOGDIR;/&RUN_POST_TN;{{ uscore_ensmem_name }}_f#fhr##fmn#<cyclestr>_@Y@m@d@H</cyclestr>&LOGEXT;</join>
         {%- else %}
-        <jobname>&RUN_POST_TN;{{ uscore_ensmem_name }}_f#fhr#</jobname>
+        <jobname>&RUN_POST_TN;{{ uscore_ensmem_name }}</jobname>
 	<join>&LOGDIR;/&RUN_POST_TN;{{ uscore_ensmem_name }}_f#fhr#<cyclestr>_@Y@m@d@H</cyclestr>&LOGEXT;</join>
         {%- endif %}
 
@@ -772,7 +772,7 @@ the <task> tag to be identical to the ones above for other output times.
       <walltime>{{ wtime_run_post }}</walltime>
       <nodesize>&NCORES_PER_NODE;</nodesize>
       <native>&SCHED_NATIVE_CMD;</native>
-      <jobname>&RUN_POST_TN;{{ uscore_ensmem_name }}_f#fhr##fmn#</jobname>
+      <jobname>&RUN_POST_TN;{{ uscore_ensmem_name }}</jobname>
       <join>&LOGDIR;/&RUN_POST_TN;{{ uscore_ensmem_name }}_f#fhr##fmn#<cyclestr>_@Y@m@d@H</cyclestr>&LOGEXT;</join>
 
       <envar><name>GLOBAL_VAR_DEFNS_FP</name><value>&GLOBAL_VAR_DEFNS_FP;</value></envar>
